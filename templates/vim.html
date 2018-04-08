@@ -1,0 +1,455 @@
+{% extends 'index.html' %}
+
+{% block head-page-specific-plugin-styles %}
+    <!-- 特定页面CSS -->
+    <link rel="stylesheet" href="/static/css/jquery-ui-1.10.3.custom.min.css"/>
+    <link rel="stylesheet" href="/static/css/chosen.css"/>
+    <link rel="stylesheet" href="/static/css/datepicker.css"/>
+    <link rel="stylesheet" href="/static/css/bootstrap-timepicker.css"/>
+    <link rel="stylesheet" href="/static/css/daterangepicker.css"/>
+    <link rel="stylesheet" href="/static/css/colorpicker.css"/>
+    <link rel="stylesheet" href="/static/css/ui.jqgrid.css"/>
+{% endblock %}
+
+
+
+
+
+{% block body-breadcrumb %}
+    <ul class="breadcrumb">
+        <li>
+            <i class="icon-home home-icon"></i>
+            <a href="/">主页</a>
+        </li>
+        <li>运维小工具</li>
+        <li class="active">创建VLAN网络</li>
+    </ul><!-- .breadcrumb -->
+{% endblock %}
+
+
+{% block body-page-content %}
+
+    <div class="page-content">
+        <div class="row">
+            <div class="col-xs-12" id="widget">
+                <div class="widget-box">
+                    <div class="widget-header widget-header-small">
+                        <h5 class="lighter">操作框</h5>
+                    </div>
+                    <div class="widget-body">
+                        <div class="widget-main">
+                            <div class="row">
+                                <form class="form-horizontal" role="form" action="/createVlanNetwork/" method="post">
+                                    <div class="space-4"></div>
+                                    <div class="space-4"></div>
+                                    <div class="form-group">
+                                        <label class="col-sm-3 control-label no-padding-right"> 租户列表<sup
+                                                style="color: red">*</sup> </label>
+                                        <div class="col-sm-9">
+                                            <select class="col-sm-4" id="projectList" name="projectList"
+                                                    onchange="checkbuttonState()">
+                                                <option value="0"> - - - - 请 选 择 租 户 - - - -</option>
+                                                {% for project_record in project_list %}
+                                                    <option value="{{ project_record.project_id }}">{{ project_record.project_name }}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-sm-3 control-label no-padding-right"> 网络名称<sup
+                                                style="color: red">*</sup> </label>
+                                        <div class="col-sm-9">
+                                            <input id="networkTitle_id" name="networkTitle" type="text"
+                                                   placeholder="请输入网络名称"
+                                                   class="col-sm-4" onchange="checkbuttonState()"/>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-sm-3 control-label no-padding-right"> 子网名称<sup
+                                                style="color: red">*</sup> </label>
+                                        <div class="col-sm-9">
+                                            <input id="subnetTitle_id" name="subnetTitle" type="text"
+                                                   placeholder="请输入子网名称"
+                                                   class="col-sm-4" onchange="checkbuttonState()"/>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="col-sm-3 control-label no-padding-right"> 网络地址<sup
+                                                style="color: red">*</sup> </label>
+
+                                        <div class="col-sm-9">
+                                            <input id="networkIP_id" name="networkIP" type="text"
+                                                   placeholder="例如192.168.0.0/24"
+                                                   class="col-sm-4"
+                                                   onkeypress="return (event.keyCode ||event.which)>=48 && (event.keyCode ||event.which)<=57 ||  (event.keyCode ||event.which)==46 || (event.keyCode ||event.which)==47"
+                                                   onchange="checkbuttonState()"/>
+                                        </div>
+
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-sm-3 control-label no-padding-right"> 网关地址<sup
+                                                style="color: red">*</sup> </label>
+
+                                        <div class="col-sm-9">
+                                            <input id="gatewayIP_id" name="gatewayIP" type="text"
+                                                   placeholder="例如192.168.0.256"
+                                                   class="col-sm-4"
+                                                   onkeypress="return (event.keyCode ||event.which)>=48 && (event.keyCode ||event.which)<=57 ||  (event.keyCode ||event.which)==46"
+                                                   onchange="checkbuttonState()"/>
+                                        </div>
+
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-sm-3 control-label no-padding-right"> VlanID号<sup
+                                                style="color: red">*</sup> </label>
+
+                                        <div class="col-sm-9">
+                                            <input id="vlanID_id" name="vlanID" type="text"
+                                                   placeholder="VLAN ID号码建议范围：2~1001"
+                                                   class="col-sm-4"
+                                                   onkeypress="return (event.keyCode ||event.which)>=48 && (event.keyCode ||event.which)<=57"
+                                                   onchange="checkbuttonState()"/>
+                                        </div>
+
+                                    </div>
+                                    <div class="space-4"></div>
+
+                                    <div class="clearfix form-actions">
+                                        <div class="col-md-offset-3 col-md-9">
+
+                                            <button class="btn btn-info kw" type="button" id="submit" name="submit"
+                                                    disabled="disabled">
+                                                <i class="icon-ok bigger-110"></i>
+                                                创建
+                                            </button>
+
+                                            &nbsp; &nbsp; &nbsp;
+                                            <button class="btn kw" type="reset" onclick="ChangeButtonState()"
+                                                    id="reset">
+                                                <i class="icon-undo bigger-110"></i>
+                                                重置
+                                            </button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-xs-12" id="space">
+                <div class="space-4"></div>
+                <div class="space-4"></div>
+                <div class="space-4"></div>
+            </div><!-- /.col -->
+
+            <div class="col-xs-12">
+                <table id="vlan-table"></table>
+                <div id="vlan-pager"></div>
+            </div>
+
+        </div>
+    </div><!-- /.page-content -->
+
+{% endblock %}
+
+
+
+<!-- page specific plugin scripts -->
+{% block body-page-specific-plugin-scripts %}
+    <!-- 特定页面scripts -->
+    <script src="/static/js/jquery-ui-1.10.3.custom.min.js"></script>
+    <script src="/static/js/jquery.ui.touch-punch.min.js"></script>
+    <script src="/static/js/chosen.jquery.min.js"></script>
+    <script src="/static/js/fuelux/fuelux.spinner.min.js"></script>
+    <script src="/static/js/date-time/bootstrap-datepicker.min.js"></script>
+    <script src="/static/js/date-time/bootstrap-timepicker.min.js"></script>
+    <script src="/static/js/date-time/moment.min.js"></script>
+    <script src="/static/js/date-time/daterangepicker.min.js"></script>
+    <script src="/static/js/bootstrap-colorpicker.min.js"></script>
+    <script src="/static/js/jquery.knob.min.js"></script>
+    <script src="/static/js/jquery.autosize.min.js"></script>
+    <script src="/static/js/jquery.inputlimiter.1.3.1.min.js"></script>
+    <script src="/static/js/jquery.maskedinput.min.js"></script>
+    <script src="/static/js/bootstrap-tag.min.js"></script>
+    <script src="/static/js/date-time/bootstrap-datepicker.min.js"></script>
+    <script src="/static/js/jqGrid/jquery.jqGrid.min.js"></script>
+    <script src="/static/js/jqGrid/i18n/grid.locale-en.js"></script>
+    <script src="/static/js/noty/packaged/jquery.noty.packaged.min.js"></script>
+    <script src="/static/js/noty/themes/default.js"></script>
+    <script src="/static/js/noty/themes/metroui.js"></script>
+    <script src="/static/js/noty/layouts/topRight.js"></script>
+{% endblock %}
+
+
+<!-- inline scripts related to this page -->
+{% block body-inline-scripts %}
+    <script type="text/javascript">
+
+        jQuery('#submit').click(function () {
+            $('#submit').attr('disabled', true)
+
+            var networkTitle_id = $('#networkTitle_id').val()
+            var subnetTitle_id = $('#subnetTitle_id').val()
+            var networkIP_id = $('#networkIP_id').val()
+            var gatewayIP_id = $('#gatewayIP_id').val()
+            var vlanID_id = $('#vlanID_id').val()
+            var projectList_id = $('#projectList').val()
+
+            $.post("/createVlanNetwork/",
+                {
+                    networkTitle_id: networkTitle_id,
+                    subnetTitle_id: subnetTitle_id,
+                    networkIP_id: networkIP_id,
+                    gatewayIP_id: gatewayIP_id,
+                    vlanID_id: vlanID_id,
+                    projectList: projectList_id
+                },
+                function (data, status) {
+                    var obj = JSON.parse(data);
+                    resStatus = obj.status
+                    if (resStatus == 0) {
+                        noty({
+                            text: '成功：VLAN网络创建成功！网络信息详见如下网络列表！',
+                            type: 'success',
+                            layout: 'topRight',
+                            theme: 'metroui',
+                            timeout: 5000,
+                            modal: false,
+                            closeWith: ['button']
+                        });
+                    } else {
+                        noty({
+                            text: '失败：VLAN网络创建失败！失败原因如下：' + obj.msg,
+                            type: 'error',
+                            layout: 'topRight',
+                            theme: 'metroui',
+                            timeout: 5000,
+                            modal: false,
+                            closeWith: ['button']
+                        });
+                    }
+                    jQuery("#vlan-table").setGridParam({datatype: 'json', page: 1}).trigger("reloadGrid")
+                    $('#submit').attr('disabled', false)
+                });
+        });
+    </script>
+
+    <script type="text/javascript">
+        var height = 0.4 * (window.screen.availHeight - document.getElementById("widget").offsetHeight - document.getElementById("space").offsetHeight );
+        jQuery(function () {
+            jQuery("#vlan-table").jqGrid({
+                url: '/createVlanNetwork?type=load',
+                datatype: "json",
+                height: height,
+                colNames: ['编号', '租户名', '网络名称', '子网名称', '网络地址', '网关地址', 'VLAN ID'],
+                colModel: [
+                    {
+                        name: 'n_pos',
+                        index: 'n_pos',
+                        width: 25,
+                        editable: false,
+                        hidden: true
+                    },
+                    {
+                        name: 'n_project',
+                        index: 'n_project',
+                        width: 100,
+                        editable: false,
+                        align: 'right'
+                    },
+                    {
+                        name: 'n_network',
+                        index: 'n_network',
+                        width: 100,
+                        editable: false,
+                        align: 'center'
+                    },
+                    {
+                        name: 'n_subnet',
+                        index: 'n_subnet',
+                        width: 100,
+                        editable: false,
+                        align: 'center'
+                    },
+                    {
+                        name: 'n_ipaddr',
+                        index: 'n_ipaddr',
+                        width: 125,
+                        editable: false,
+                        align: 'center'
+                    },
+                    {
+                        name: 'n_gateway',
+                        index: 'n_gateway',
+                        width: 125,
+                        editable: false,
+                        align: 'center'
+                    },
+                    {
+                        name: 'n_vlan',
+                        index: 'n_vlan',
+                        width: 50,
+                        editable: false,
+                        align: 'center'
+                    }
+                ],
+                altRows: true,
+                editurl: '/createVlanNetwork/',//nothing is saved 注意结尾/ , APPEND_SLASH
+                caption: "VLAN网络列表",
+                autowidth: true,
+
+                pager: "#vlan-pager",
+                rowNum: 6,
+                rowList: [2, 4, 6, 8, 10, 12],
+                viewrecords: true,
+                emptyrecords: "并没有发现任何记录",
+                rownumbers: true,
+                rownumWidth: 30,
+                pgbuttons: true,
+                loadtext: "加载中，请稍后... ...",
+                sortable: true,
+                sortname: 'n_project',
+                sortorder: 'asc',
+                loadonce: true,
+                recordtext: "当前显示 {0} - {1} 条记录， 共 {2} 条记录",
+                pgtext: "第 {0} 页 / 共 {1} 页",
+
+                grouping: true,
+                groupingView: {
+                    groupField: ['n_project'],
+                    groupDataSorted: true,//分组中的数据是否排序
+                    groupColumnShow: [true, true],//是否显示分组列
+                    groupText: ['<b>{0} - {1} Item(s)</b>'],
+                    groupOrder: ["asc"],
+                    groupCollapse: false,
+                    plusicon: 'icon-plus-sign',
+                    minusicon: 'icon-minus-sign'
+
+                },
+                loadComplete: function () {
+                    var table = this;
+                    setTimeout(function () {
+                        updatePagerIcons(table);
+                    }, 0);
+                    $("#vlan-table").closest(".ui-jqgrid-bdiv").css({'overflow-y': 'scroll'});
+
+                },
+                jsonReader: {
+                    root: "data",
+                    total: "total",
+                    page: "page",
+                    records: "records",
+                    repeatitems: false
+
+
+                },
+
+            });
+
+            jQuery("#vlan-table").jqGrid('navGrid', "#vlan-pager",
+                { 	//navbar options
+                    edit: false,
+                    editicon: 'icon-pencil blue',
+                    add: false,
+                    addicon: 'icon-plus-sign purple',
+                    del: false,
+                    delicon: 'icon-trash red',
+                    search: true,
+                    searchicon: 'icon-search orange',
+                    refresh: true,
+                    refreshicon: 'icon-refresh green',
+                    view: true,
+                    viewicon: 'icon-zoom-in grey'
+
+                }, {}, {}, {}, {multipleSearch: true, multipleGroup: true});
+
+            jQuery("#refresh_vlan-table").click(function () {
+
+                jQuery("#vlan-table").setGridParam({datatype: 'json', page: 1}).trigger("reloadGrid")
+            });
+
+        });
+
+        function updatePagerIcons(table) {
+            var replacement =
+                {
+                    'ui-icon-seek-first': 'icon-double-angle-left bigger-140',
+                    'ui-icon-seek-prev': 'icon-angle-left bigger-140',
+
+                    'ui-icon-seek-next': 'icon-angle-right bigger-140',
+                    'ui-icon-seek-end': 'icon-double-angle-right bigger-140'
+                };
+            $('.ui-pg-table:not(.navtable) > tbody > tr > .ui-pg-button > .ui-icon').each(function () {
+                var icon = $(this);
+                var $class = $.trim(icon.attr('class').replace('ui-icon', ''));
+
+                if ($class in replacement) icon.attr('class', 'ui-icon ' + replacement[$class]);
+            })
+        }
+
+    </script>
+
+    <script type="text/javascript">
+        function checkbuttonState() {
+            $('#networkTitle_id').val($('#networkTitle_id').val().replace(/\s+/g, ""))
+            $('#subnetTitle_id').val($('#subnetTitle_id').val().replace(/\s+/g, ""))
+            $('#networkIP_id').val($('#networkIP_id').val().replace(/\s+/g, ""))
+            $('#gatewayIP_id').val($('#gatewayIP_id').val().replace(/\s+/g, ""))
+            $('#vlanID_id').val($('#vlanID_id').val().replace(/\s+/g, ""))
+
+            if ($('#projectList').val() != 0 && $('#networkTitle_id').val() != '' && $('#subnetTitle_id').val() != '' && $('#networkIP_id').val() != '' && $('#gatewayIP_id').val() != '' && $('#vlanID_id').val() != '') {
+                $('#submit').attr('disabled', false)
+            } else {
+                $('#submit').attr('disabled', true)
+            }
+
+            if ($('#vlanID_id').val() != '' && ($('#vlanID_id').val() < 2 || $('#vlanID_id').val() > 1001)) {
+                noty({
+                    text: '警告：请输入正确的Vlan ID号码！Vlan ID取值范围：2~1001！!',
+                    type: 'warning',
+                    layout: 'topRight',
+                    theme: 'metroui',
+                    timeout: 5000,
+                    modal: false,
+                    closeWith: ['button']
+                });
+                $('#submit').attr('disabled', true)
+            } else {
+                var list = {{ vlanID_list }};
+                if ( list.indexOf(parseInt($('#vlanID_id').val())) > -1) {
+                    noty({
+                        text: '警告：请输入正确的Vlan ID号码！该Vlan ID号码已存在！',
+                        type: 'warning',
+                        layout: 'topRight',
+                        theme: 'metroui',
+                        timeout: 5000,
+                        modal: false,
+                        closeWith: ['button']
+                    });
+                    $('#submit').attr('disabled', true)
+                }
+            }
+
+            if (isNaN($('#vlanID_id').val())) {
+                noty({
+                    text: '警告：请输入正确的Vlan ID号码！Vlan ID号码为纯数字！',
+                    type: 'warning',
+                    layout: 'topRight',
+                    theme: 'metroui',
+                    timeout: 5000,
+                    modal: false,
+                    closeWith: ['button']
+                });
+                $('#submit').attr('disabled', true)
+            }
+        }
+
+        function ChangeButtonState() {
+            $('#submit').attr('disabled', true)
+        }
+
+    </script>
+{% endblock %}
